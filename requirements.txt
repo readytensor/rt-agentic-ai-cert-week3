@@ -1,0 +1,4 @@
+langchain~=0.3.25
+langchain_groq
+python-dotenv~=1.1.0
+pyyaml~=6.0.2
