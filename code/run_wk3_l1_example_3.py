@@ -86,7 +86,8 @@ def main() -> None:
         print("✓ Groq API key loaded.")
 
         print("Loading publication content...")
-        publication_content = load_publication()
+        vae_publication_id = 'yzN0OCQT7hUS'
+        publication_content = load_publication(publication_external_id=vae_publication_id)
         print(f"✓ Publication loaded ({len(publication_content)} characters).")
 
         print("Loading application configuration...")

@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from pathlib import Path
 from typing import Union, Optional
 
-from paths import PUBLICATION_FPATH, ENV_FPATH
+from paths import DATA_DIR, PUBLICATION_FPATH, ENV_FPATH
 
 
-def load_publication():
+def load_publication(publication_external_id='yzN0OCQT7hUS'):
     """Loads the publication markdown file.
 
     Returns:
@@ -17,15 +17,21 @@ def load_publication():
         FileNotFoundError: If the file does not exist.
         IOError: If there's an error reading the file.
     """
-    file_path = Path(PUBLICATION_FPATH)
+    publication_fpath = Path(
+        os.path.join(
+            DATA_DIR, 
+            publication_external_id,
+            "publication.md"
+        )
+    )
 
     # Check if file exists
-    if not file_path.exists():
-        raise FileNotFoundError(f"Publication file not found: {file_path}")
+    if not publication_fpath.exists():
+        raise FileNotFoundError(f"Publication file not found: {publication_fpath}")
 
     # Read and return the file content
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(publication_fpath, "r", encoding="utf-8") as file:
             return file.read()
     except IOError as e:
         raise IOError(f"Error reading publication file: {e}") from e
