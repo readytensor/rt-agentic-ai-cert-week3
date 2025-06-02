@@ -35,7 +35,7 @@ ai_assistant_system_prompt_advanced:
   output_format:
     - Provide answers in markdown format.
     - Provide concise answers in bullet points when relevant.
-
+    - Avoid providing code examples in your response unless specifically asked to.
 
 rag_assistant_prompt:
   description: "Week 3 - RAG assistant prompt"
