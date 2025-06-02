@@ -60,6 +60,7 @@ def retrieve_relevant_documents(
 
 
 def respond_to_query(
+    prompt_config: dict,
     query: str,
     llm: str,
     n_results: int = 5,
@@ -123,6 +124,7 @@ if __name__ == "__main__":
 
         print(
             respond_to_query(
+                prompt_config=prompt_config,
                 query=query,
                 llm=llm,
                 **vectordb_params,
