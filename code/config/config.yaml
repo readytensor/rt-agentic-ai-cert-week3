@@ -5,7 +5,7 @@ vectordb:
   n_results: 5
 
 memory_strategies:
-  trimming_window_size: 8 # Number of messages to keep in trimming strategy
+  trimming_window_size: 6 # Number of messages to keep in trimming strategy (6 would be 3 pairs of Q/A)
   summarization_max_tokens: 1000 # Max tokens before summarization kicks in
 
 reasoning_strategies:
