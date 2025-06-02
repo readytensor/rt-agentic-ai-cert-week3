@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory, ConversationSummaryBufferMemory
+# Removed deprecated LangChain memory imports - implementing custom memory management
 import tiktoken
 
 sys.path.append(str(Path(__file__).parent.parent))
@@ -21,6 +21,17 @@ def count_tokens(text: str, model: str = "gpt-3.5-turbo") -> int:
     except:
         # Fallback estimation if tiktoken fails
         return len(text.split()) * 1.3
+
+
+def apply_trimming_strategy(conversation_history: list, window_size: int, system_prompt: str) -> list:
+    """Apply trimming strategy - keep only recent messages."""
+    # Always keep system prompt + last N user/AI message pairs
+    system_msg = [SystemMessage(content=system_prompt)]
+    
+    if len(conversation_history) <= window_size:
+        return system_msg + conversation_history
+    else:
+        return system_msg + conversation_history[-window_size:]
 
 
 def messages_to_string(messages: list) -> str:
@@ -68,6 +79,11 @@ def run_memory_strategy_comparison(
     print(f"Total questions to process: {len(questions)}")
     print("=" * 80)
     
+    # Capture final prompts for comparison
+    final_stuffing_prompt = ""
+    final_trimming_prompt = ""
+    final_summary_prompt = ""
+    
     # Strategy 1: Stuffing (keep everything)
     print("\n📝 Strategy 1: STUFFING (Keep All Messages)")
     print("-" * 50)
@@ -82,6 +98,10 @@ def run_memory_strategy_comparison(
         
         # Count tokens before LLM call
         prompt_tokens = count_tokens(messages_to_string(stuffing_conversation))
+        
+        # Capture final prompt for comparison
+        if i == len(questions):
+            final_stuffing_prompt = messages_to_string(stuffing_conversation)
         
         try:
             # Get response
@@ -119,30 +139,36 @@ def run_memory_strategy_comparison(
     print(f"\n✂️ Strategy 2: TRIMMING (Keep Last {trimming_window_size} Messages)")
     print("-" * 50)
     
-    trimming_memory = ConversationBufferWindowMemory(k=trimming_window_size, return_messages=True)
+    trimming_conversation = []
     trimming_tokens = []
     trimming_responses = []
     
     for i, question in enumerate(questions, 1):
-        # Get current conversation history
-        history = trimming_memory.chat_memory.messages
+        # Add user message to history
+        trimming_conversation.append(HumanMessage(content=question))
         
-        # Build messages with system prompt + history + new question
-        messages = [SystemMessage(content=system_prompt)] + history + [HumanMessage(content=question)]
+        # Apply trimming strategy
+        messages = apply_trimming_strategy(trimming_conversation[:-1], trimming_window_size, system_prompt)
+        messages.append(HumanMessage(content=question))
         
         # Count tokens
         prompt_tokens = count_tokens(messages_to_string(messages))
+        
+        # Capture final prompt for comparison
+        if i == len(questions):
+            final_summary_prompt = messages_to_string(messages)
+        
+        # Capture final prompt for comparison
+        if i == len(questions):
+            final_trimming_prompt = messages_to_string(messages)
         
         try:
             # Get response
             response = llm.invoke(messages)
             response_tokens = count_tokens(response.content)
             
-            # Save to memory (this handles the windowing)
-            trimming_memory.save_context(
-                {"input": question}, 
-                {"output": response.content}
-            )
+            # Add AI response to conversation history
+            trimming_conversation.append(AIMessage(content=response.content))
             
             # Track metrics
             trimming_tokens.append({
@@ -167,20 +193,22 @@ def run_memory_strategy_comparison(
     print(f"\n📋 Strategy 3: SUMMARIZATION (Compress History, max {summarization_max_tokens} tokens)")
     print("-" * 50)
     
-    summary_memory = ConversationSummaryBufferMemory(
-        llm=llm,
-        max_token_limit=summarization_max_tokens,
-        return_messages=True
-    )
+    summary_conversation = []
     summary_tokens = []
     summary_responses = []
     
     for i, question in enumerate(questions, 1):
-        # Get current conversation history
-        history = summary_memory.chat_memory.messages
+        # Add user message to history
+        summary_conversation.append(HumanMessage(content=question))
         
-        # Build messages with system prompt + history + new question
-        messages = [SystemMessage(content=system_prompt)] + history + [HumanMessage(content=question)]
+        # Apply summarization strategy
+        messages = apply_summarization_strategy(
+            summary_conversation[:-1], 
+            llm, 
+            summarization_max_tokens, 
+            system_prompt
+        )
+        messages.append(HumanMessage(content=question))
         
         # Count tokens
         prompt_tokens = count_tokens(messages_to_string(messages))
@@ -190,11 +218,8 @@ def run_memory_strategy_comparison(
             response = llm.invoke(messages)
             response_tokens = count_tokens(response.content)
             
-            # Save to memory (this handles the summarization)
-            summary_memory.save_context(
-                {"input": question}, 
-                {"output": response.content}
-            )
+            # Add AI response to conversation history
+            summary_conversation.append(AIMessage(content=response.content))
             
             # Track metrics
             summary_tokens.append({
@@ -219,14 +244,16 @@ def run_memory_strategy_comparison(
     generate_comparison_report(
         stuffing_tokens, trimming_tokens, summary_tokens,
         stuffing_responses, trimming_responses, summary_responses,
-        system_prompt, questions
+        system_prompt, questions,
+        final_stuffing_prompt, final_trimming_prompt, final_summary_prompt
     )
 
 
 def generate_comparison_report(
     stuffing_tokens, trimming_tokens, summary_tokens,
     stuffing_responses, trimming_responses, summary_responses,
-    system_prompt, questions
+    system_prompt, questions,
+    final_stuffing_prompt, final_trimming_prompt, final_summary_prompt
 ):
     """Generate detailed comparison report."""
     
@@ -292,20 +319,31 @@ def generate_comparison_report(
         report_content.append(f"### Final Question: '{final_question}'")
         report_content.append("")
         
-        # Add more detailed prompt structure examples here
         report_content.append("**Stuffing Strategy Final Prompt:**")
         report_content.append(f"- Contains ALL {len(stuffing_responses)} previous Q&A pairs")
         report_content.append(f"- Total prompt size: {stuffing_tokens[-1]['prompt_tokens'] if stuffing_tokens else 0:,} tokens")
+        report_content.append("")
+        report_content.append("```")
+        report_content.append(final_stuffing_prompt[:1000] + "..." if len(final_stuffing_prompt) > 1000 else final_stuffing_prompt)
+        report_content.append("```")
         report_content.append("")
         
         report_content.append("**Trimming Strategy Final Prompt:**")
         report_content.append("- Contains last 8 messages only (4 Q&A pairs)")
         report_content.append(f"- Total prompt size: {trimming_tokens[-1]['prompt_tokens'] if trimming_tokens else 0:,} tokens")
         report_content.append("")
+        report_content.append("```")
+        report_content.append(final_trimming_prompt[:1000] + "..." if len(final_trimming_prompt) > 1000 else final_trimming_prompt)
+        report_content.append("```")
+        report_content.append("")
         
         report_content.append("**Summarization Strategy Final Prompt:**")
         report_content.append("- Contains summary + recent messages")
         report_content.append(f"- Total prompt size: {summary_tokens[-1]['prompt_tokens'] if summary_tokens else 0:,} tokens")
+        report_content.append("")
+        report_content.append("```")
+        report_content.append(final_summary_prompt[:1000] + "..." if len(final_summary_prompt) > 1000 else final_summary_prompt)
+        report_content.append("```")
         report_content.append("")
     
     # Save report
