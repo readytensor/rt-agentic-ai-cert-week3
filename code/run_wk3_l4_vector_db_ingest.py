@@ -59,6 +59,7 @@ def get_db_collection(
 
     Args:
         persist_directory (str): The directory where ChromaDB persists data
+        collection_name (str): The name of the collection to get
 
     Returns:
         chromadb.PersistentClient: The ChromaDB client instance

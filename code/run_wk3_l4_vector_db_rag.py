@@ -23,9 +23,9 @@ def retrieve_relevant_documents(
     Query the ChromaDB database with a string query.
 
     Args:
-        collection (chromadb.Collection): The ChromaDB collection to query
         query (str): The search query string
         n_results (int): Number of results to return (default: 5)
+        threshold (float): Threshold for the cosine similarity score (default: 0.3)
 
     Returns:
         dict: Query results containing ids, documents, distances, and metadata
