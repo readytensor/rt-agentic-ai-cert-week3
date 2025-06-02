@@ -1,10 +1,31 @@
 import os
+import logging
 from dotenv import load_dotenv
 from utils import load_yaml_config
 from prompt_builder import build_prompt_from_config
 from langchain_groq import ChatGroq
-from paths import APP_CONFIG_FPATH, PROMPT_CONFIG_FPATH
+from paths import APP_CONFIG_FPATH, PROMPT_CONFIG_FPATH, OUTPUTS_DIR
 from run_wk3_l4_vector_db_ingest import get_db_collection, embed_documents
+
+logger = logging.getLogger()
+
+
+def setup_logging():
+
+    logger.setLevel(logging.INFO)
+
+    # File handler
+    file_handler = logging.FileHandler(os.path.join(OUTPUTS_DIR, "rag_assistant.log"))
+    file_handler.setLevel(logging.INFO)
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+
+    # Add handlers to the logger
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
+
 
 load_dotenv()
 
@@ -30,17 +51,17 @@ def retrieve_relevant_documents(
     Returns:
         dict: Query results containing ids, documents, distances, and metadata
     """
-    print(f"Retrieving relevant documents for query: {query}")
+    logging.info(f"Retrieving relevant documents for query: {query}")
     relevant_results = {
         "ids": [],
         "documents": [],
         "distances": [],
     }
     # Embed the query using the same model used for documents
-    print("Embedding query...")
+    logging.info("Embedding query...")
     query_embedding = embed_documents([query])[0]  # Get the first (and only) embedding
 
-    print("Querying collection...")
+    logging.info("Querying collection...")
     # Query the collection
     results = collection.query(
         query_embeddings=[query_embedding],
@@ -48,7 +69,7 @@ def retrieve_relevant_documents(
         include=["documents", "distances"],
     )
 
-    print("Filtering results...")
+    logging.info("Filtering results...")
     keep_item = [False] * len(results["ids"][0])
     for i, distance in enumerate(results["distances"][0]):
         if distance < threshold:
@@ -78,16 +99,18 @@ def respond_to_query(
         query, n_results=n_results, threshold=threshold
     )
 
-    print("-" * 100)
-    print("Relevant documents:")
+    logging.info("-" * 100)
+    logging.info("Relevant documents: \n")
     for doc in relevant_documents:
-        print(doc)
-        print("-" * 100)
-    print("-" * 100)
+        logging.info(doc)
+        logging.info("-" * 100)
+    logging.info("")
 
-    print("User's question:")
-    print(query)
-    print("-" * 100)
+    logging.info("User's question:")
+    logging.info(query)
+    logging.info("")
+    logging.info("-" * 100)
+    logging.info("")
     input_data = (
         f"Relevant documents:\n\n{relevant_documents}\n\nUser's question:\n\n{query}"
     )
@@ -103,6 +126,7 @@ def respond_to_query(
 
 
 if __name__ == "__main__":
+    setup_logging()
     app_config = load_yaml_config(APP_CONFIG_FPATH)
     prompt_config = load_yaml_config(PROMPT_CONFIG_FPATH)
 
@@ -133,4 +157,4 @@ if __name__ == "__main__":
             llm=llm,
             **vectordb_params,
         )
-        print(response, "\n\n")
+        logging.info(response + "\n\n")
