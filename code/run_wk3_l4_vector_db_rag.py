@@ -30,14 +30,17 @@ def retrieve_relevant_documents(
     Returns:
         dict: Query results containing ids, documents, distances, and metadata
     """
+    print(f"Retrieving relevant documents for query: {query}")
     relevant_results = {
         "ids": [],
         "documents": [],
         "distances": [],
     }
     # Embed the query using the same model used for documents
+    print("Embedding query...")
     query_embedding = embed_documents([query])[0]  # Get the first (and only) embedding
 
+    print("Querying collection...")
     # Query the collection
     results = collection.query(
         query_embeddings=[query_embedding],
@@ -45,6 +48,7 @@ def retrieve_relevant_documents(
         include=["documents", "distances"],
     )
 
+    print("Filtering results...")
     keep_item = [False] * len(results["ids"][0])
     for i, distance in enumerate(results["distances"][0]):
         if distance < threshold:
@@ -113,6 +117,7 @@ if __name__ == "__main__":
         if query == "exit":
             exit_app = True
             exit()
+
         elif query == "config":
             threshold = float(input("Enter the retrieval threshold: "))
             n_results = int(input("Enter the Top K value: "))
@@ -122,12 +127,10 @@ if __name__ == "__main__":
             }
             continue
 
-        print(
-            respond_to_query(
-                prompt_config=prompt_config,
-                query=query,
-                llm=llm,
-                **vectordb_params,
-            ),
-            "\n\n",
+        response = respond_to_query(
+            prompt_config=prompt_config,
+            query=query,
+            llm=llm,
+            **vectordb_params,
         )
+        print(response, "\n\n")
