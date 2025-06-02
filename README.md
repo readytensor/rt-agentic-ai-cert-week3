@@ -12,11 +12,11 @@ This repository contains the practical code and exercises for **Week 3** of the 
 
 **Lesson 2 - System Prompts for Control & Safety:**
 
-- Craft modular system prompts that define your assistant’s behavior, boundaries, and tone.
-- Learn how to handle manipulative questions and safeguard your assistant’s instructions.
+- Craft modular system prompts that define your assistant's behavior, boundaries, and tone.
+- Learn how to handle manipulative questions and safeguard your assistant's instructions.
 - See how small changes in your system prompt dramatically improve reliability and security.
 
-You’ll experiment with real-world scenarios, using a publication about Variational Autoencoders (VAEs) as the test case.
+You'll experiment with real-world scenarios, using a publication about Variational Autoencoders (VAEs) as the test case.
 
 ## Repository Structure
 
@@ -97,6 +97,16 @@ This repository includes scripts to help you experiment with different types of 
 
   - Tests system prompt configurations (basic and advanced) to see how they handle manipulative questions and maintain professional tone and safety.
 
+### Lesson 4 — Vector Database & RAG Implementation
+
+- **`run_wk3_l4_vector_db_ingest.py`**
+
+  - **Vector Database Ingestion:** Initializes a ChromaDB instance with persistent storage, chunks publications into smaller documents, embeds them using HuggingFace transformers, and stores them in the vector database for semantic search.
+
+- **`run_wk3_l4_vector_db_rag.py`**
+
+  - **Retrieval-Augmented Generation (RAG):** Interactive terminal-based chat that retrieves relevant documents from the vector database based on user queries and generates contextual responses using retrieved content. Includes configurable similarity thresholds and result counts.
+
 Each script saves outputs and transcripts in the `outputs/` directory for easy review and comparison.
 
 ---
@@ -115,7 +125,7 @@ Each script saves outputs and transcripts in the `outputs/` directory for easy r
 The `prompt_builder.py` module takes YAML configurations and dynamically assembles system prompts. You can:
 
 - Adjust modular components like **role, tone, output constraints, and format**.
-- Test how small changes improve your assistant’s reliability, especially for edge cases and manipulative questions.
+- Test how small changes improve your assistant's reliability, especially for edge cases and manipulative questions.
 - Use real-world scenarios to refine your system prompts and see their impact.
 
 ---
