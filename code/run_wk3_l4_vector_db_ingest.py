@@ -9,7 +9,7 @@ from utils import load_all_publications
 
 
 def initialize_db(
-    persist_directory: str = VECTOR_DB_DIR,
+    persist_directory: str = "./vector_db",
     collection_name: str = "publications",
     delete_existing: bool = False,
 ) -> chromadb.Collection:
@@ -41,7 +41,8 @@ def initialize_db(
         collection = client.create_collection(
             name=collection_name,
             metadata={
-                "hnsw:space": "cosine"
+                "hnsw:space": "cosine",
+                "hnsw:batch_size": 10000,
             },  # Use cosine similarity for semantic search
         )
         print(f"Created new collection: {collection_name}")
