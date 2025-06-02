@@ -8,7 +8,9 @@ from utils import load_all_publications
 
 
 def initialize_db(
-    persist_directory: str = "./vector_db", collection_name: str = "publications"
+    persist_directory: str = "./vector_db",
+    collection_name: str = "publications",
+    delete_existing: bool = False,
 ) -> chromadb.Collection:
     """
     Initialize a ChromaDB instance and persist it to disk.
@@ -16,11 +18,11 @@ def initialize_db(
     Args:
         persist_directory (str): The directory where ChromaDB will persist data. Defaults to "./vector_db"
         collection_name (str): The name of the collection to create/get. Defaults to "publications"
-
+        delete_existing (bool): Whether to delete the existing database if it exists. Defaults to False
     Returns:
         chromadb.Collection: The ChromaDB collection instance
     """
-    if os.path.exists(persist_directory):
+    if os.path.exists(persist_directory) and delete_existing:
         shutil.rmtree(persist_directory)
 
     os.makedirs(persist_directory, exist_ok=True)
@@ -48,9 +50,10 @@ def initialize_db(
     return collection
 
 
-def get_db_client(
+def get_db_collection(
     persist_directory: str = "./vector_db",
-) -> chromadb.PersistentClient:
+    collection_name: str = "publications",
+) -> chromadb.Collection:
     """
     Get a ChromaDB client instance.
 
@@ -60,7 +63,9 @@ def get_db_client(
     Returns:
         chromadb.PersistentClient: The ChromaDB client instance
     """
-    return chromadb.PersistentClient(path=persist_directory)
+    return chromadb.PersistentClient(path=persist_directory).get_collection(
+        name=collection_name
+    )
 
 
 def chunk_publication(
@@ -122,7 +127,9 @@ def insert_publications(collection: chromadb.Collection, publications: list[str]
 
 def main():
     collection = initialize_db(
-        persist_directory="./vector_db", collection_name="publications"
+        persist_directory="./vector_db",
+        collection_name="publications",
+        delete_existing=True,
     )
     publications = load_all_publications()
     insert_publications(collection, publications)
