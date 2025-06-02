@@ -2,13 +2,14 @@ import os
 import torch
 import chromadb
 import shutil
+from paths import VECTOR_DB_DIR
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from utils import load_all_publications
 
 
 def initialize_db(
-    persist_directory: str = "./vector_db",
+    persist_directory: str = VECTOR_DB_DIR,
     collection_name: str = "publications",
     delete_existing: bool = False,
 ) -> chromadb.Collection:
@@ -51,7 +52,7 @@ def initialize_db(
 
 
 def get_db_collection(
-    persist_directory: str = "./vector_db",
+    persist_directory: str = VECTOR_DB_DIR,
     collection_name: str = "publications",
 ) -> chromadb.Collection:
     """
@@ -128,7 +129,7 @@ def insert_publications(collection: chromadb.Collection, publications: list[str]
 
 def main():
     collection = initialize_db(
-        persist_directory="./vector_db",
+        persist_directory=VECTOR_DB_DIR,
         collection_name="publications",
         delete_existing=True,
     )
