@@ -4,6 +4,10 @@ vectordb:
   threshold: 0.5
   n_results: 5
 
+memory_strategies:
+  trimming_window_size: 8 # Number of messages to keep in trimming strategy
+  summarization_max_tokens: 1000 # Max tokens before summarization kicks in
+
 reasoning_strategies:
   CoT: |
     Use this systematic approach to provide your response:
