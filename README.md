@@ -32,6 +32,8 @@ rt-agentic-ai-cert-week3/
 │   ├── run_wk3_l1_example_1_2.py       # Lesson 1: Basic LLM calls and multi-turn conversations
 │   ├── run_wk3_l1_example_3.py         # Lesson 1: Interactive terminal chat example
 │   ├── run_wk3_l2_sys_prompt_example.py # Lesson 2: System prompt examples and testing
+│   ├── run_wk3_l4_vector_db_ingest.py  # Lesson 4: Vector DB ingestion script
+│   ├── run_wk3_l4_vector_db_rag.py     # Lesson 4: Vector DB RAG example
 │   └── utils.py                        # Utility functions
 ├── data/                               # Sample publications for exercises
 │   ├── 57Nhu0gMyonV.md
