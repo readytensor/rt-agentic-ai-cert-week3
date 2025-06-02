@@ -29,9 +29,10 @@ rt-agentic-ai-cert-week3/
 │   │   └── prompt_config.yaml          # Prompt configurations for system prompt examples
 │   ├── paths.py                        # File path configurations
 │   ├── prompt_builder.py               # Modular prompt construction functions
-│   ├── run_wk3_l1_example_1_2.py       # Lesson 1: Basic LLM calls and multi-turn conversations
+│   ├── run_wk3_l1_example_1_2.py       # Lesson 1: Basic LLM calls and publication grounding
 │   ├── run_wk3_l1_example_3.py         # Lesson 1: Interactive terminal chat example
 │   ├── run_wk3_l2_sys_prompt_example.py # Lesson 2: System prompt examples and testing
+│   ├── run_wk3_l3a_memory_strategies.py # Lesson 3A: Memory strategies comparison
 │   ├── run_wk3_l4_vector_db_ingest.py  # Lesson 4: Vector DB ingestion script
 │   ├── run_wk3_l4_vector_db_rag.py     # Lesson 4: Vector DB RAG example
 │   └── utils.py                        # Utility functions
