@@ -1,0 +1,75 @@
+# Sample conversation questions for VAE publication (yzN0OCQT7hUS)
+# These simulate natural conversation flow for memory management demo
+questions:
+  # Basic understanding and overview
+  - "what are variational autoencoders"
+  - "how is it different from regular autoencoders"
+  - "so they are neural network based?"
+  - "can you explain the basic architecture of a VAE"
+  - "so its based on bayesian modeling"
+  - "what are the main applications of VAEs they mentioned"
+
+  # Data compression focus
+  - "tell me about how VAEs can be used for data compression"
+  - "how much compression did you achieve with MNIST images"
+  - "what makes VAE compression different from traditional methods"
+  - "are there any quality trade-offs when compressing with VAEs"
+  - "could we use it for other type of data, say tabular data"
+
+  # Data generation deep dive
+  - "how do VAEs generate new data"
+  - "can you explain how the morphing between digits works"
+  - "what does the 2D latent space visualization show us"
+  - "how do you control what kind of digits get generated"
+  - "are the generated digits actually useful or just interesting demos"
+  - "can they be used for timeseries data generation"
+
+  # Noise reduction exploration
+  - "how are VAEs used for noise reduction"
+  - "what types of noise can VAEs handle"
+  - "how well did the denoising work at different noise levels"
+  - "why do VAEs work better than traditional denoising methods"
+  - "what are real-world applications for VAE denoising"
+
+  # Anomaly detection focus
+  - "how do VAEs detect anomalies"
+  - "what is reconstruction error and why does it matter"
+  - "can you explain the letter experiment you did"
+  - "why did the letter Z get reconstructed better than other letters"
+  - "what are some practical use cases for VAE anomaly detection"
+  - "how do you set the threshold for what counts as an anomaly"
+
+  # Missing data imputation
+  - "how do VAEs handle missing data"
+  - "can you show me examples of the missing data reconstruction"
+  - "how much of the image can be missing and still get good results"
+  - "what are real-world scenarios where this would be useful"
+  - "how does VAE imputation compare to other missing data methods"
+
+  # Technical implementation details
+  - "can you walk me through the PyTorch implementation"
+  - "what is the reparameterization trick"
+  - "why is the reparameterization trick necessary"
+  - "what does the loss function combine"
+  - "how do you choose the latent dimension size"
+  - "what happens if you make the latent space too small or too large"
+
+  # Comparisons and alternatives
+  - "how do VAEs compare to GANs"
+  - "when would you choose VAEs over GANs"
+  - "what are the main advantages of VAEs"
+  - "what are the limitations of VAEs"
+  - "are there other generative models I should consider"
+
+  # Cross-application questions
+  - "which of these applications is most important in practice"
+  - "can you use VAEs for multiple purposes in the same project"
+  - "do all these applications require the same VAE architecture"
+  - "how do you evaluate which application works best"
+
+  # Future and extensions
+  - "what other datasets could these techniques work on"
+  - "can VAEs work with non-image data"
+  - "what are some advanced VAE variants"
+  - "where do you see VAE research heading"
+  - "what would be a good next step to try these myself"

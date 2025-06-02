@@ -33,8 +33,12 @@ rt-agentic-ai-cert-week3/
 │   ├── run_wk3_l1_example_3.py         # Lesson 1: Interactive terminal chat example
 │   ├── run_wk3_l2_sys_prompt_example.py # Lesson 2: System prompt examples and testing
 │   └── utils.py                        # Utility functions
-├── data/
-│   └── publication.md                  # Sample publication for exercises
+├── data/                               # Sample publications for exercises
+│   ├── 57Nhu0gMyonV.md
+│   ├── ljGAbBceZbpv.md
+│   ├── tum5RnE4A5W8.md
+│   ├── yzN0OCQT7hUS-sample-questions.yaml  # Sample questions used in lesson 3 exercise
+│   └── yzN0OCQT7hUS.md
 ├── outputs/                            # Generated prompts and LLM responses
 ├── .gitignore
 ├── LICENSE
