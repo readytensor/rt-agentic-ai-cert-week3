@@ -25,6 +25,7 @@ def print_instructions(config_name: str):
     print("Type your question and press Enter.")
     print("Type 'q' to quit or 'c' to clear the screen.\n")
 
+
 def run_interactive_conversation_with_system_prompt(
     publication_content: str, 
     model_name: str,
