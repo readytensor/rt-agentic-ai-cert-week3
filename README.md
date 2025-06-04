@@ -98,6 +98,13 @@ This repository includes scripts to help you experiment with different types of 
 
   - Tests system prompt configurations (basic and advanced) to see how they handle manipulative questions and maintain professional tone and safety.
 
+### Lesson 3A — Memory Management Strategies
+
+- **`run_wk3_l3a_memory_strategies.py`**
+  - Compares three memory management strategies: stuffing everything, trimming to recent messages, and summarizing conversation history.
+  - Simulates a long conversation using real questions, saving detailed results (Q&A pairs, token usage, and final prompts) in the `outputs/` directory.
+  - Includes an interactive mode for running a single strategy or a full comparison report.
+
 ### Lesson 4 — Vector Database & RAG Implementation
 
 - **`run_wk3_l4_vector_db_ingest.py`**

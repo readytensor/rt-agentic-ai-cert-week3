@@ -10,6 +10,22 @@ from utils import load_publication, load_yaml_config, load_env, save_text_to_fil
 from prompt_builder import build_system_prompt_from_config, print_prompt_preview
 from paths import OUTPUTS_DIR, APP_CONFIG_FPATH, PROMPT_CONFIG_FPATH
 
+
+def clear_screen():
+    if os.name == "nt":  # Windows
+        os.system("cls")
+    else:
+        os.system("clear")
+
+
+def print_instructions(config_name: str):
+    print("\n" + "="*80)
+    print(f"Interactive Q&A Assistant with System Prompt — VAE Publication Chat 📝")
+    print(f"Using config: {config_name}")
+    print("Type your question and press Enter.")
+    print("Type 'q' to quit or 'c' to clear the screen.\n")
+
+
 def run_interactive_conversation_with_system_prompt(
     publication_content: str, 
     model_name: str,
@@ -64,7 +80,14 @@ def run_interactive_conversation_with_system_prompt(
     ]
 
     while True:
+        print_instructions(system_prompt_config_name)
         user_input = input("You: ")
+        
+        # Check if user wants to clear the screen
+        if user_input.lower() in ["c", "clear"]:
+            clear_screen()
+            continue
+        
         if user_input.lower() in ["quit", "q"]:
             print("Exiting. Goodbye!")
             break
