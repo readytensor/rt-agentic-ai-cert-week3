@@ -116,8 +116,11 @@ def respond_to_query(
     )
 
     rag_assistant_prompt = build_prompt_from_config(
-        prompt_config["rag_assistant_prompt"], input_data=input_data
+        prompt_config, input_data=input_data
     )
+
+    logging.info(f"RAG assistant prompt: {rag_assistant_prompt}")
+    logging.info("")
 
     llm = ChatGroq(model=llm)
 
@@ -129,6 +132,8 @@ if __name__ == "__main__":
     setup_logging()
     app_config = load_yaml_config(APP_CONFIG_FPATH)
     prompt_config = load_yaml_config(PROMPT_CONFIG_FPATH)
+
+    rag_assistant_prompt = prompt_config["rag_assistant_prompt"]
 
     vectordb_params = app_config["vectordb"]
     llm = app_config["llm"]
@@ -152,9 +157,11 @@ if __name__ == "__main__":
             continue
 
         response = respond_to_query(
-            prompt_config=prompt_config,
+            prompt_config=rag_assistant_prompt,
             query=query,
             llm=llm,
             **vectordb_params,
         )
+        logging.info("-" * 100)
+        logging.info("LLM response:")
         logging.info(response + "\n\n")
