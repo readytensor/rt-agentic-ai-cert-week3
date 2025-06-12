@@ -29,6 +29,7 @@ class ChatWithMemory:
 
         self.current_session = None
         self.memory = None
+        self.chat_history = []  # Cache chat history in memory
 
     def start_session(self, session_name: str = None):
         """Start or load a chat session."""
@@ -59,8 +60,12 @@ class ChatWithMemory:
             memory_key="chat_history", chat_memory=history, return_messages=True
         )
 
+        # Load chat history once when starting session
+        memory_vars = self.memory.load_memory_variables({})
+        self.chat_history = memory_vars.get("chat_history", [])
+
         # Check if existing session
-        existing_messages = len(history.messages)
+        existing_messages = len(self.chat_history)
         if existing_messages > 0:
             print(
                 f"Loaded existing session '{session_name}' with {existing_messages} messages"
@@ -68,31 +73,30 @@ class ChatWithMemory:
         else:
             print(f"Started new session '{session_name}'")
 
-    def chat(self, user_input: str) -> str:
+    def ask(self, user_input: str) -> str:
         """Send message and get response."""
         if not self.memory:
             raise ValueError("No active session. Call start_session() first.")
 
-        # Get chat history
-        memory_vars = self.memory.load_memory_variables({})
-        chat_history = memory_vars.get("chat_history", [])
-
-        # Build messages
+        # Build messages using cached chat history
         messages = [SystemMessage(content="You are a helpful AI assistant.")]
-        messages.extend(chat_history)
+        messages.extend(self.chat_history)
         messages.append(HumanMessage(content=user_input))
 
         response = self.llm.invoke(messages)
 
-        # Save to memory
+        # Save to persistent memory
         self.memory.save_context({"input": user_input}, {"output": response.content})
+
+        # Update cached chat history
+        self.chat_history.append(HumanMessage(content=user_input))
+        self.chat_history.append(response)
 
         return response.content
 
     def list_sessions(self):
         """List all sessions."""
         try:
-
             conn = sqlite3.connect(CHAT_HISTORY_DB_FPATH)
             cursor = conn.cursor()
 
@@ -222,7 +226,7 @@ def main():
                     print("Usage: view <session_name>")
                 continue
             elif user_input:
-                response = chat.chat(user_input)
+                response = chat.ask(user_input)
                 print(f"AI: {response}")
 
         except KeyboardInterrupt:
