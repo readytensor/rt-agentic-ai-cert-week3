@@ -1,22 +1,36 @@
 # Ready Tensor Agentic AI Certification - Week 3
 
-This repository contains the practical code and exercises for **Week 3** of the Ready Tensor Agentic AI Certification program. Week 3 builds on the modular prompt engineering concepts introduced in Week 2 and adds practical examples of multi-turn conversations and robust system prompts.
+This repository contains the lessons, practical code and exercises for **Week 3** of the Ready Tensor Agentic AI Certification program. Week 3 builds on the modular prompt engineering concepts introduced in Week 2 and adds practical examples of multi-turn conversations and robust system prompts.
 
 ## What You'll Learn
 
-**Lesson 1 - Basic LLM Calls & Multi-Turn Conversations:**
+- Making your **first LLM calls** and grounding them in publication content
+- Designing safe, consistent, and modular **system prompts**
+- Managing **chat memory** in long conversations
+- Adding **memory persistence** for session continuity
+- Implementing a full **RAG pipeline** using vector databases and embeddings
 
-- Make your first LLM calls using LangChain and Groq.
-- Ground your questions in publication content for accurate, context-aware answers.
-- Explore how context is managed in multi-turn conversations.
+## Lessons in This Repository
 
-**Lesson 2 - System Prompts for Control & Safety:**
+### 1. Your First LLM Calls: Getting Started with Groq & LangChain
 
-- Craft modular system prompts that define your assistant's behavior, boundaries, and tone.
-- Learn how to handle manipulative questions and safeguard your assistant's instructions.
-- See how small changes in your system prompt dramatically improve reliability and security.
+Make basic LLM calls using LangChain and Groq. Learn to ground questions in documents and maintain context in multi-turn conversations.
 
-You'll experiment with real-world scenarios, using a publication about Variational Autoencoders (VAEs) as the test case.
+### 2. System Prompts: Your AI’s Operating Manual
+
+Design modular system prompts that define assistant behavior, tone, and safety boundaries. See how prompt structure impacts reliability and security.
+
+### 3a. Memory Management Strategies: When Conversations Get Too Long
+
+Explore how to manage growing conversation history using three strategies: stuffing, recent-only, and summarization — and analyze their trade-offs.
+
+### 3b. Memory Persistence: Saving Conversations Across Sessions
+
+Add memory persistence to your assistant so users can resume chats across sessions. Covers LangChain’s memory types and custom database implementations.
+
+### 4. Building Your Research Assistant: A Step-by-Step RAG Implementation
+
+Build a complete RAG system that semantically retrieves publication content and uses it to generate grounded, context-aware responses in real time.
 
 ## Repository Structure
 
@@ -42,6 +56,7 @@ rt-agentic-ai-cert-week3/
 │   ├── tum5RnE4A5W8.md
 │   ├── yzN0OCQT7hUS-sample-questions.yaml  # Sample questions used in lesson 3 exercise
 │   └── yzN0OCQT7hUS.md
+├── lessons/                            # Lesson content and exercises
 ├── outputs/                            # Generated prompts and LLM responses
 ├── .gitignore
 ├── LICENSE
@@ -116,25 +131,6 @@ This repository includes scripts to help you experiment with different types of 
   - **Retrieval-Augmented Generation (RAG):** Interactive terminal-based chat that retrieves relevant documents from the vector database based on user queries and generates contextual responses using retrieved content. Includes configurable similarity thresholds and result counts.
 
 Each script saves outputs and transcripts in the `outputs/` directory for easy review and comparison.
-
----
-
-## Key Features
-
-- **System Prompt Testing:** Explore how different system prompt configurations affect your assistant’s behavior, style, and security.
-- **Multi-Turn Conversations:** See how context builds up in an interactive chat, and how to manage it effectively.
-- **Real-World Examples:** Grounded in a research publication about Variational Autoencoders (VAEs) to simulate real user scenarios.
-- **Modular Approach:** Use the same modular components (role, tone, constraints) from Week 2, but applied in system prompts for reliability and trustworthiness.
-
----
-
-## How It Works
-
-The `prompt_builder.py` module takes YAML configurations and dynamically assembles system prompts. You can:
-
-- Adjust modular components like **role, tone, output constraints, and format**.
-- Test how small changes improve your assistant's reliability, especially for edge cases and manipulative questions.
-- Use real-world scenarios to refine your system prompts and see their impact.
 
 ---
 
