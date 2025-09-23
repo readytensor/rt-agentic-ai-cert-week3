@@ -5,7 +5,7 @@
 ---
 
 [⬅️ Previous - Memory Persistence](https://app.readytensor.ai/publications/Ax1KnCSIt9QI)
-[➡️ Next - Project 1 Submission Guidelines](https://app.readytensor.ai/publications/BblNcQTBi5Os)
+[➡️ Next - Project 1 Template](https://app.readytensor.ai/publications/exE2ntdB3aIr)
 
 ---
 
@@ -348,6 +348,6 @@ To see how RAG works in practice, we've prepared a **two-part implementation wal
 ---
 
 [⬅️ Previous - Memory Persistence](https://app.readytensor.ai/publications/Ax1KnCSIt9QI)
-[➡️ Next - Project 1 Submission Guidelines](https://app.readytensor.ai/publications/BblNcQTBi5Os)
+[➡️ Next - Project 1 Template](https://app.readytensor.ai/publications/exE2ntdB3aIr)
 
 ---
