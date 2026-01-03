@@ -1,6 +1,6 @@
-# Ready Tensor Agentic AI Certification - Week 3
+# Ready Tensor Agentic AI Certification - Unit 3
 
-This repository contains the lessons, practical code and exercises for **Week 3** of the [Agentic AI Developer Certification Program](https://app.readytensor.ai/publications/HrJ0xWtLzLNt) by Ready Tensor. Week 3 builds on the modular prompt engineering concepts introduced in Week 2 and adds practical examples of multi-turn conversations and robust system prompts.
+This repository contains the lessons, practical code and exercises for **Unit 3** of the [Agentic AI Developer Certification Program](https://app.readytensor.ai/publications/HrJ0xWtLzLNt) by Ready Tensor. Unit 3 builds on the modular prompt engineering concepts introduced in Unit 2 and adds practical examples of multi-turn conversations and robust system prompts.
 
 ## What You'll Learn
 
@@ -36,7 +36,7 @@ Build a complete RAG system that semantically retrieves publication content and 
 
 ```
 
-rt-agentic-ai-cert-week3/
+rt-agentic-ai-cert-unit3/
 ├── code/
 │   ├── config/
 │   │   ├── config.yaml                 # App config
