@@ -78,14 +78,38 @@ This is what we’ve been doing so far:
 ❌ Doesn’t scale for long chats
 ❌ Expensive and can lead to hallucination
 
-You can implement this with LangChain’s **ConversationBufferMemory**:
+You can implement this with LangChain’s **ChatMessageHistory**:
+
+:::info{title="Info"}
+LangChain has deprecated `langchain.memory`. Below is a simple example demonstrating how to handle previous conversations, we can leverage **LangChain Runnables**, specifically `RunnableWithMessageHistory`, which provides built-in support for managing conversational memory.
+:::
 
 ```python
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_groq import ChatGroq
+import os
 
-memory = ConversationBufferMemory(return_messages=True)
-conversation = ConversationChain(llm=llm, memory=memory, verbose=True)
+from dotenv import load_dotenv
+load_dotenv()
+
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful research assistant."),
+    MessagesPlaceholder("history"),
+    ("human", "{input}")
+])
+history = ChatMessageHistory()
+
+# Your "Stuff Everything In" demo:
+history.add_user_message("Tell me about VAE applications")
+history.add_ai_message("VAEs have 5 major applications...")
+history.add_user_message("What about data compression specifically?")
+history.add_ai_message("For data compression, VAEs work by learning efficient representations...")
+
+response = llm.invoke(prompt.format(history=history.messages, input="What about data compression?"))
+print(response.content)
+
 ```
 
 ---
@@ -114,13 +138,28 @@ This approach:
 ✅ Keeps context recent and relevant
 ❌ May lose important older context if the user switches topics back
 
-LangChain’s **ConversationBufferWindowMemory** makes this easy:
+LangChain’s **ChatMessageHistory** and a simple chat window logic makes this easy:
 
 ```python
-from langchain.memory import ConversationBufferWindowMemory
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import MessagesPlaceholder
+from langchain_groq import ChatGroq
 
-memory = ConversationBufferWindowMemory(k=3, return_messages=True)
-conversation = ConversationChain(llm=llm, memory=memory, verbose=True)
+llm = ChatGroq(model="llama-3.1-8b-instant")
+history = ChatMessageHistory()
+
+def chat(msg):
+    history.messages = history.messages[-2:]  # Magic line: keeps last 2
+    msgs = [("system", "Helpful assistant")] + history.messages + [("human", msg)]
+    response = llm.invoke(msgs)
+    history.add_user_message(msg)
+    history.add_ai_message(response.content)
+    return response.content
+
+print(chat("VAE applications?"))
+print(chat("Data compression details"))
+print(chat("Turn 47 math details"))
+print(chat("What do you remember about our conversation?"))
 ```
 
 ---
@@ -149,13 +188,29 @@ AI Assistant Turn 45: For noise reduction, VAEs filter...
 ❌ Summary generation adds complexity and cost
 ❌ May lose subtle details in summarization
 
-This strategy can be implemented with LangChain’s **ConversationSummaryMemory**:
+This strategy can be implemented with LangChain’s **ChatMessageHistory** and a simple logic:
 
 ```python
-from langchain.memory import ConversationSummaryMemory
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_groq import ChatGroq
 
-memory = ConversationSummaryMemory(llm=llm, return_messages=True)
-conversation = ConversationChain(llm=llm, memory=memory, verbose=True)
+llm = ChatGroq(model="llama-3.1-8b-instant")
+history = ChatMessageHistory()
+
+# After 12+ messages, summarize old history
+if len(history.messages) > 12:
+    old_history = history.messages[:-12]  # Everything except last 6 messages
+    summary_prompt = f"Summarize conversation:\n{' '.join([str(m) for m in old_history])}"
+    summary = llm.invoke(summary_prompt).content
+    print("Summary:", summary)
+    
+    # Use summary + recent messages
+    context = [summary] + [str(m) for m in history.messages[-6:]]
+else:
+    context = [str(m) for m in history.messages]
+
+response = llm.invoke(context + ["Turn 45: Noise reduction?"])
+print("Response:", response.content)
 ```
 
 ---

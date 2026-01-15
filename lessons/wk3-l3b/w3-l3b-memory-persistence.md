@@ -38,20 +38,40 @@ LangChain provides simple persistence options to get started quickly:
 ## File-based Storage
 
 ```python
-from langchain.memory import ConversationBufferMemory
-from langchain.memory.chat_message_histories import FileChatMessageHistory
+import os
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_community.chat_message_histories import FileChatMessageHistory
 
-# Save to a file specific to this user/session
-memory = ConversationBufferMemory(
-    chat_memory=FileChatMessageHistory("chat_history_user123.json"),
-    return_messages=True
+load_dotenv()
+
+llm = ChatGroq(model="llama-3.1-8b-instant")
+
+# Setup File Persistence
+# This loads existing history from the JSON file
+file_history = FileChatMessageHistory("chat_history_user123.json")
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful research assistant."),
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "{input}"),
+])
+
+user_input = "What are VAEs?"
+
+formatted_prompt = prompt.format_messages(
+    history=file_history.messages, 
+    input=user_input
 )
 
-conversation = ConversationChain(llm=llm, memory=memory)
-response = conversation.predict(input="What are VAEs?")
+response = llm.invoke(formatted_prompt)
 
-# When the user returns, just initialize with the same file
-# The conversation history will be automatically loaded
+# Save the new messages to the file history
+file_history.add_user_message(user_input)
+file_history.add_ai_message(response.content)
+
+print(f"\nAI Response:\n{response.content}")
 ```
 
 ✅ **Best for:** small-scale apps, development, or testing
@@ -68,15 +88,46 @@ from langchain.memory import ConversationBufferMemory
 from langchain.memory.chat_message_histories import SQLChatMessageHistory
 
 # Save to SQLite database
-memory = ConversationBufferMemory(
-    chat_memory=SQLChatMessageHistory(
-        session_id="user123_session456",
-        connection_string="sqlite:///chat_history.db"
-    ),
-    return_messages=True
+import os
+from dotenv import load_dotenv
+from langchain_groq import ChatGroq
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_community.chat_message_histories import SQLChatMessageHistory
+
+load_dotenv()
+
+# Initialize Groq LLM
+llm = ChatGroq(model="llama-3.1-8b-instant")
+
+# Setup SQLite Persistence
+# This stores history in a local SQL database called chat_history.db
+sql_history = SQLChatMessageHistory(
+    session_id="user123_session456",
+    connection_string="sqlite:///chat_history.db"
 )
 
-conversation = ConversationChain(llm=llm, memory=memory)
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful research assistant."),
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "{input}"),
+])
+
+user_input = "Tell me more about VAE use cases."
+
+# Format prompt with existing SQL history
+formatted_prompt = prompt.format_messages(
+    history=sql_history.messages, 
+    input=user_input
+)
+
+response = llm.invoke(formatted_prompt)
+
+# Save new messages to SQL history
+sql_history.add_user_message(user_input)
+sql_history.add_ai_message(response.content)
+
+print(f"\nAI Response:\n{response.content}")
+
 ```
 
 ✅ **Best for:** small teams, prototypes, or simple production setups

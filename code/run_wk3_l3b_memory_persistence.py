@@ -3,8 +3,7 @@ import sqlite3
 import warnings
 from datetime import datetime
 from paths import CHAT_HISTORY_DB_FPATH, APP_CONFIG_FPATH
-from langchain_community.chat_message_histories.sql import SQLChatMessageHistory
-from langchain.memory import ConversationBufferMemory
+from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage, SystemMessage
 from utils import load_env, load_yaml_config
@@ -28,7 +27,7 @@ class ChatWithMemory:
         )
 
         self.current_session = None
-        self.memory = None
+        self.history = None
         self.chat_history = []  # Cache chat history in memory
 
     def start_session(self, session_name: str = None):
@@ -38,31 +37,14 @@ class ChatWithMemory:
 
         self.current_session = session_name
 
-        # Setup memory
-        history = SQLChatMessageHistory(
-            connection=f"sqlite:///{CHAT_HISTORY_DB_FPATH}",
+        # Setup history
+        self.history = SQLChatMessageHistory(
+            connection_string=f"sqlite:///{CHAT_HISTORY_DB_FPATH}",
             session_id=session_name,
         )
 
-        # Or use PostgresChatMessageHistory
-        # history = PostgresChatMessageHistory(
-        #     connection_string=f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}",
-        #     session_id=session_name,
-        # )
-
-        # Or use FileChatMessageHistory
-        # history = FileChatMessageHistory(
-        #     file_path=f"{CHAT_HISTORY_DB_FPATH}",
-        #     session_id=session_name,
-        # )
-
-        self.memory = ConversationBufferMemory(
-            memory_key="chat_history", chat_memory=history, return_messages=True
-        )
-
         # Load chat history once when starting session
-        memory_vars = self.memory.load_memory_variables({})
-        self.chat_history = memory_vars.get("chat_history", [])
+        self.chat_history = self.history.messages
 
         # Check if existing session
         existing_messages = len(self.chat_history)
@@ -75,7 +57,7 @@ class ChatWithMemory:
 
     def ask(self, user_input: str) -> str:
         """Send message and get response."""
-        if not self.memory:
+        if not self.history:
             raise ValueError("No active session. Call start_session() first.")
 
         # Build messages using cached chat history
@@ -85,8 +67,9 @@ class ChatWithMemory:
 
         response = self.llm.invoke(messages)
 
-        # Save to persistent memory
-        self.memory.save_context({"input": user_input}, {"output": response.content})
+        # Save to persistent history
+        self.history.add_user_message(user_input)
+        self.history.add_ai_message(response.content)
 
         # Update cached chat history
         self.chat_history.append(HumanMessage(content=user_input))
@@ -126,7 +109,7 @@ class ChatWithMemory:
         try:
             # Create temporary history object for the session
             temp_history = SQLChatMessageHistory(
-                connection=f"sqlite:///{CHAT_HISTORY_DB_FPATH}",
+                connection_string=f"sqlite:///{CHAT_HISTORY_DB_FPATH}",
                 session_id=session_id,
             )
             return temp_history.messages
